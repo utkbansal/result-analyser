@@ -48,7 +48,7 @@ class Marks(models.Model):
     internal_theory = models.IntegerField()
     internal_practical = models.IntegerField()
     semester = models.IntegerField()
-    credits = models.IntegerField()
+    credit = models.IntegerField()
     back = models.BooleanField()
 
     class Meta:
