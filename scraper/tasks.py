@@ -1,4 +1,5 @@
 from datetime import datetime
+from multiprocessing import Pool
 
 from bs4 import BeautifulSoup
 
@@ -269,6 +270,13 @@ def get_college_result(college_code):
         save_result_data(college_code, year)
 
 
+def start():
+    codes = [college.code for college in College.objects.all()]
+
+    pool = Pool(8)
+    pool.map(get_college_result, codes)
+
+    print 'Getting results'
+
 if __name__ == '__main__':
-    get_college_result('027')
-    print 'Getting result of college code: 027'
+    start()

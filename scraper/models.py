@@ -12,8 +12,7 @@ class Student(models.Model):
         return unicode(self.roll_no)
 
 # code is being taken as a CharField instead of IntegerField
-# because codes may start with a 0 which may be simply ignored
-# by python or cause other problems.
+# because codes may start with a 0 which will be converted to octal
 
 
 class College(models.Model):
