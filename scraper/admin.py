@@ -7,6 +7,10 @@ from datetime import datetime
 
 # Register your models here.
 def save_colleges():
+    """
+    Populates the College table with all the colleges of UPTU
+    return: None
+    """
     
     # URL of wikipedia page where list of the institutions of UPTU and their code is given
     URL='http://en.wikipedia.org/wiki/List_of_colleges_affiliated_to_Uttar_Pradesh_Technical_University'
@@ -25,7 +29,7 @@ def save_colleges():
                 code=college_code,
                 name=college_name
             )
-        new_college.save() # Saving new college to database
+            new_college.save() # Saving new college to database
     print '...', len(College.objects.all()), ' colleges added'
 
 def roll_no_generator(college_code, year):
@@ -70,22 +74,22 @@ def get_result_data(roll_no, year):
         data3 = str(soup.find(id='__EVENTVALIDATION')['value'])
 
         login_credentials = {
-        '__EVENTTARGET':'',
-        '__EVENTARGUMENT':'',
-        '__VIEWSTATE': data1,
-        '__VIEWSTATEGENERATOR': data2,
-        '__EVENTVALIDATION': data3,
-        'ctl00$ContentPlaceHolder1$txtRoll': str(roll_no),
-        'ctl00$ContentPlaceHolder1$capt1$txtcaptcha' : captcha,
-        'ctl00$ContentPlaceHolder1$btnSubmit' : 'Submit'
+            '__EVENTTARGET':'',
+            '__EVENTARGUMENT':'',
+            '__VIEWSTATE': data1,
+            '__VIEWSTATEGENERATOR': data2,
+            '__EVENTVALIDATION': data3,
+            'ctl00$ContentPlaceHolder1$txtRoll': str(roll_no),
+            'ctl00$ContentPlaceHolder1$capt1$txtcaptcha' : captcha,
+            'ctl00$ContentPlaceHolder1$btnSubmit' : 'Submit'
         }
         response = s.post(URL, data=login_credentials)
     soup = BeautifulSoup(response.text)
     try:
         name = soup.find(id='ctl00_ContentPlaceHolder1_lblName').text.strip()
-        print 'getting name: ', name
+        print 'Getting result of ', name
     except AttributeError:
-        print 'getting error'
+        print 'Roll number does not exist'
         return False
     college_code=soup.find(id='ctl00_ContentPlaceHolder1_lblInstName')\
         .text.split('(')[-1][:-1]
@@ -234,7 +238,7 @@ def save_result_data(college_code, year):
                                 print 'Subject added ', new_subject.name
                         if key == 'result_odd':
                             sem = 2 * year - 1
-                        elif key == "result_even":
+                        else:
                             sem = 2 * year
 
                         for subject_code in data[key]:
@@ -260,10 +264,10 @@ def save_result_data(college_code, year):
 
 
 def get_college_result(college_code):
-    '''
+    """
     updates subjects, branches and saves data of all the years of college 
     of given college_code
-    '''
+    """
     for year in range(1, 5): save_result_data(college_code, year)
 if __name__ == '__main__':
     get_college_result('027')
