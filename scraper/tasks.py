@@ -27,8 +27,8 @@ def save_colleges():
                 code=college_code,
                 name=college_name
             )
-        # Saving new college to database
-        new_college.save()
+            # Saving new college to database
+            new_college.save()
     print '...', len(College.objects.all()), ' colleges added'
 
 
@@ -238,7 +238,7 @@ def save_result_data(college_code, year):
                                 print 'Subject added ', new_subject.name
                         if key == 'result_odd':
                             sem = 2 * year - 1
-                        elif key == "result_even":
+                        else:
                             sem = 2 * year
 
                         for subject_code in data[key]:
