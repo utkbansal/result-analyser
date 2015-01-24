@@ -36,15 +36,27 @@ def create_excel(college_code, branch_code, sem):
     workbook = xlsxwriter.Workbook('test.xlsx')
     worksheet = workbook.add_worksheet()
 
-    i = 1
+    i = 2
 
+    subject_codes = results[0]['marks'].keys()
+    for num in range(len(subject_codes)):
+        if subject_codes[num][1:4] == 'OE0':
+            subject_codes[num] = 'Open Elective'
     # Print subject codes in first row
     for j in range(len(results[0]['marks'].keys())):
-        worksheet.merge_range(0, j*3 + 3, 0, (j + 1)*3 + 2, results[0]['marks'].keys()[j])
+        worksheet.merge_range(0, j*3 + 3, 0, (j + 1)*3 + 2, subject_codes[j])
 
     worksheet.write(0, 0, 'Roll No')
     worksheet.write(0, 1, 'Name')
     worksheet.write(0, 2, 'Fathers Name')
+
+    for c in range(3, 3 * len(subject_codes) + 3):
+        if c % 3 == 0:
+            worksheet.write(1, c, 'External')
+        elif c % 3 == 1:
+            worksheet.write(1, c, 'Internal')
+        else:
+            worksheet.write(1, c, 'Total')
 
     for result in results:
 
