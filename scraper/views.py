@@ -14,6 +14,6 @@ class AnalysisFormView(generic.FormView):
         branch_code = form.cleaned_data['branch_code']
         sem = form.cleaned_data['semester']
 
-        create_excel(college_code, branch_code, sem)
+        create_excel(college_code[0], branch_code[0], sem)
 
         return HttpResponseRedirect(self.get_success_url())

@@ -31,10 +31,15 @@ def result_dict(college_code, branch_code, sem):
 
 def create_excel(college_code, branch_code, sem):
     results = result_dict(college_code, branch_code, int(sem))
-    print results
+    #print results
 
     workbook = xlsxwriter.Workbook('test.xlsx')
     worksheet = workbook.add_worksheet()
+
+    # Creating format properties
+
+    worksheet.set_column(0, 0, 12)
+    worksheet.set_column(1, 2, 25)
 
     i = 2
 
