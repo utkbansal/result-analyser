@@ -36,7 +36,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'scraper'
+    'scraper',
+    'crispy_forms',
 )
 
 MIDDLEWARE_CLASSES = (
