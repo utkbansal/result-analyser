@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'scraper',
     'crispy_forms',
+    'django.contrib.webdesign',
 )
 
 MIDDLEWARE_CLASSES = (

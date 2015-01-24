@@ -29,6 +29,9 @@ class AnalysisForm(forms.Form):
             'branch_code',
             'semester',
             ButtonHolder(
-                Submit('submit', 'Submit', css_class='btn-primary')
+                Submit('download', 'Download', css_class='btn-block ')
+            ),
+            ButtonHolder(
+                Submit('analyze', 'Analyze', css_class='btn-block ')
             )
         )
