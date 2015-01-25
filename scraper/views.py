@@ -3,9 +3,10 @@ import os
 from django.core.urlresolvers import reverse_lazy
 from django.views import generic
 from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth import authenticate, login
 
 from .excel import create_excel
-from .forms import AnalysisForm
+from .forms import AnalysisForm, LoginForm
 from result_analyzer.settings import BASE_DIR
 
 
@@ -28,7 +29,6 @@ class AnalysisFormView(generic.FormView):
 
         data = self.get_form_kwargs()['data'].keys()
 
-
         if 'download' in data:
 
             # Downloading logic here
@@ -47,3 +47,20 @@ class AnalysisFormView(generic.FormView):
             # Redirect to analysis
 
             return HttpResponseRedirect(self.get_success_url())
+
+
+class LoginView(generic.FormView):
+    form_class = LoginForm
+    template_name = 'login.html'
+    success_url = 'analyze/'
+
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(username=username, password=password)
+
+        if user is not None and user.is_active:
+            login(self.request, user)
+            return super(LoginView, self).form_valid(form)
+        else:
+            return self.form_invalid(form)
