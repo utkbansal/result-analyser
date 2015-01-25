@@ -30,11 +30,23 @@
     <div class="container">
       <div class="header">
         <nav>
-          <ul class="nav nav-pills pull-right">
+          <ul class="nav nav-pills pull-right" style="display: inline-flex">
             <li role="presentation" class="active"><a href="#">Home</a></li>
             <li role="presentation"><a href="#">About</a></li>
               {% if user.is_authenticated %}
-                  <li role="presentation"><a href="#">Hi!, {{ user.username }}</a></li>
+                  <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true"><li role="presentation"><a href="#"></a></li>
+                        Hi!, {{ user.username }}
+                            <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Change Password</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="/analyze/logout">Logout</a></li>
+
+
+                              </ul>
+                     </div>
+
               {% else %}
                   <li role="presentation"><a href="#">Login</a></li>
               {% endif %}

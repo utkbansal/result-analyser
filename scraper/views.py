@@ -3,7 +3,8 @@ import os
 from django.core.urlresolvers import reverse_lazy
 from django.views import generic
 from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect
+from django.contrib.auth import authenticate, login, logout
 
 from .excel import create_excel
 from .forms import AnalysisForm, LoginForm
@@ -64,3 +65,11 @@ class LoginView(generic.FormView):
             return super(LoginView, self).form_valid(form)
         else:
             return self.form_invalid(form)
+
+
+class LogOutView(generic.RedirectView):
+    url = reverse_lazy('login')
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return super(LogOutView, self).get(request, *args, **kwargs)
