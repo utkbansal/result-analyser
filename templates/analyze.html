@@ -7,15 +7,19 @@
 {% endblock css %}
 
 {% block content %}
-        <div class="jumbotron">
-            <h1>Welcome to the Result Analyzer...</h1>
-        </div>
+    <div class="jumbotron">
+        <h1>Welcome to the Result Analyzer...</h1>
+    </div>
+    <div id="x"></div>
+
     {% crispy form %}
+
 {% endblock %}
 
 {% block js %}
 
     <script src="{% static 'js/select2.min.js' %}"></script>
+    <script src="{% static 'js/error.js' %}"></script>
 
     <script type="text/javascript">
     $('select').select2();

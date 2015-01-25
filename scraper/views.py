@@ -2,7 +2,8 @@ import os
 
 from django.core.urlresolvers import reverse_lazy
 from django.views import generic
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
+from django.shortcuts import render
 
 from .excel import create_excel
 from .forms import AnalysisForm
@@ -28,7 +29,6 @@ class AnalysisFormView(generic.FormView):
 
         data = self.get_form_kwargs()['data'].keys()
 
-
         if 'download' in data:
 
             # Downloading logic here
@@ -40,10 +40,12 @@ class AnalysisFormView(generic.FormView):
             response = HttpResponse(data,
                                     content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename="test.xls"'
-
             return response
 
         else:
             # Redirect to analysis
 
-            return HttpResponseRedirect(self.get_success_url())
+            return render(self.request, 'analysis.html')
+
+    def create_analysis_data(self):
+        pass
