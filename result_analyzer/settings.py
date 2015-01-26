@@ -99,3 +99,6 @@ STATICFILES_DIRS = (
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+# Set the default login url
+LOGIN_URL = '/'

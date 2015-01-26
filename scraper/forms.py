@@ -51,3 +51,23 @@ class LoginForm(AuthenticationForm):
                 Submit('login', 'Login', css_class='btn-primary')
             )
         )
+
+
+class PasswordResetForm(forms.Form):
+
+    old_password = forms.CharField(widget=forms.PasswordInput)
+    password1 = forms.CharField(widget=forms.PasswordInput)
+    password2 = forms.CharField(widget=forms.PasswordInput)
+
+    def __init__(self, *args, **kwargs):
+        super(PasswordResetForm, self).__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'old_password',
+            'password1',
+            'password2',
+            ButtonHolder(
+                Submit('submit', 'Change Password', css_class='btn-block')
+            )
+        )

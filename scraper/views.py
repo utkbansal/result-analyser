@@ -2,20 +2,20 @@ import os
 
 from django.core.urlresolvers import reverse_lazy
 from django.views import generic
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-
 from .excel import create_excel
-from .forms import AnalysisForm, LoginForm
+from .forms import AnalysisForm, LoginForm, PasswordResetForm
 from result_analyzer.settings import BASE_DIR
+from braces import views
 
 
 class AnalysisView(generic.TemplateView):
     template_name = 'analysis.html'
 
 
-class AnalysisFormView(generic.FormView):
+class AnalysisFormView(views.LoginRequiredMixin, generic.FormView):
     form_class = AnalysisForm
     template_name = 'analyze.html'
     success_url = reverse_lazy('analysis')
@@ -50,10 +50,12 @@ class AnalysisFormView(generic.FormView):
             return HttpResponseRedirect(self.get_success_url())
 
 
-class LoginView(generic.FormView):
+class LoginView(views.AnonymousRequiredMixin, generic.FormView):
     form_class = LoginForm
     template_name = 'login.html'
     success_url = 'analyze/'
+
+    authenticated_redirect_url = reverse_lazy('analyze')
 
     def form_valid(self, form):
         username = form.cleaned_data['username']
@@ -73,3 +75,24 @@ class LogOutView(generic.RedirectView):
     def get(self, request, *args, **kwargs):
         logout(request)
         return super(LogOutView, self).get(request, *args, **kwargs)
+
+
+class PasswordChangeView(views.LoginRequiredMixin, generic.FormView):
+    login_url = reverse_lazy('login')
+    form_class = PasswordResetForm
+    template_name = 'password_reset.html'
+    success_url = reverse_lazy('analyze')
+
+    def form_valid(self, form):
+        print self.request.user
+        # print self.get_form_kwargs()
+        print form.cleaned_data['old_password']
+        user = authenticate(username=self.request.user, password=form.cleaned_data['old_password'])
+        if user is not None:
+            if form.cleaned_data['password1'] == form.cleaned_data['password2']:
+                user.set_password(form.cleaned_data['password1'])
+                user.save()
+                return super(PasswordChangeView, self).form_valid(form)
+
+        else:
+            return self.form_invalid(form)
