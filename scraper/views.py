@@ -4,13 +4,18 @@ from django.core.urlresolvers import reverse_lazy
 from django.views import generic
 from django.http import HttpResponse
 from django.shortcuts import render
-
-from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from .excel import create_excel
+
+from .excel import ExcelGenerator
 from .forms import AnalysisForm, LoginForm, PasswordResetForm
+from .models import Student, Subject
 from result_analyzer.settings import BASE_DIR
+
 from braces import views
+
+
+def marks_total(marks):
+    return marks.theory + marks.practical + marks.internal_theory + marks.internal_practical
 
 
 class AnalysisView(generic.TemplateView):
@@ -32,28 +37,37 @@ class AnalysisFormView(views.LoginRequiredMixin, generic.FormView):
 
         data = self.get_form_kwargs()['data'].keys()
 
-        if 'download' in data:
+        if 'download' in data:  # Checks if user has clicked on download or not
 
             # Downloading logic here
-
-            create_excel(college_code[0], branch_code[0], int(sem))
+            # TODO: create a wrapper for create_excel
+            obj = ExcelGenerator(college_code, branch_code, int(sem))
+            obj.excel_creator()
             excel = open(os.path.join(BASE_DIR, 'test.xlsx'), 'rb')
             data = excel.read()
 
             response = HttpResponse(data,
                                     content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-            response['Content-Disposition'] = 'attachment; filename="test.xls"'
+            response['Content-Disposition'] = 'attachment; filename="test.xlsx"'
             return response
 
         else:
             # Redirect to analysis
 
-            return render(self.request, 'analysis.html')
+            data = self.create_analysis_data(form)
 
-    def create_analysis_data(self):
-        pass
-        return HttpResponseRedirect(self.get_success_url())
+            return render(self.request, 'analysis.html', dictionary={'data': data})
 
+    def create_analysis_data(self, form):
+        """
+        creates a list with data required to generate
+        google chart of the information selected by user
+        :param form: the form submitted by the user
+        :return: data needed to create excel
+        """
+        college_codes = form.cleaned_data['college_code']  # codes of the colleges selected by the user
+        branch_codes = form.cleaned_data['branch_code']  # codes of the branches selected by the user
+        sem = form.cleaned_data['semester']  # semester selected by the user
 
 class LoginView(views.AnonymousRequiredMixin, generic.FormView):
     form_class = LoginForm
@@ -89,9 +103,6 @@ class PasswordChangeView(views.LoginRequiredMixin, generic.FormView):
     success_url = reverse_lazy('analyze')
 
     def form_valid(self, form):
-        print self.request.user
-        # print self.get_form_kwargs()
-        print form.cleaned_data['old_password']
         user = authenticate(username=self.request.user, password=form.cleaned_data['old_password'])
         if user is not None:
             if form.cleaned_data['password1'] == form.cleaned_data['password2']:

@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load webdesign %}
 
 {% block content %}
-        <div class="jumbotron">
-            <h1>Welcome to the Result Analyzer...</h1>
-        </div>
+    <div class="jumbotron">
+        <h1>Welcome to the Result Analyzer...</h1>
+    </div>
+    {% lorem 5 p %}
     {% crispy form %}
 {% endblock %}

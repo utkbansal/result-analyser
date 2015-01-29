@@ -2,5 +2,30 @@
 {% load webdesign %}
 
 {% block content %}
-    {% lorem 5 p %}
+    <div id="columnchart_material" style="width: 900px; height: 500px;"></div>
+    {% lorem 5 p  %}
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1.1", {packages:["bar"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable({{ data|safe }});
+
+        var options = {
+          chart: {
+            title: 'Company Performance',
+            subtitle: 'Sales, Expenses, and Profit: 2014-2017'
+          }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, options);
+      }
+    </script>
+
 {% endblock %}
