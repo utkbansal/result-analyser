@@ -51,7 +51,7 @@ class ExcelGenerator():
         """
         results = ExcelGenerator.result_dict(self, college, branch, semester)
         # If result cannot be generated for the give combination
-        if not results:
+        if not results[0]:
             return False
 
         # Add a new worksheet to the workbook with appropriate name
@@ -63,36 +63,26 @@ class ExcelGenerator():
         worksheet.set_column(1, 2, 25)
 
         i = 2
-
-        # TEST : making the list of possible correct subjects
-        # bring in the subjects of first 5 students and compare them,
-        # the list which has max identical lists is the correct list of subjects
-
-        subject_code_megalist = [results[y]['marks'].keys() for y in range(5)]
-
-        for k in range(len(subject_code_megalist)):
-            for j in range(len(subject_code_megalist[k])):
-                if subject_code_megalist[k][j][1:4] == 'OE0':
-                    subject_code_megalist[k][j] = 'Open Elective'
-
-        check_list = [0 for k in range(5)]
-
-        for m in range(3):
-            count = 0
-            current_list = subject_code_megalist[m]
-
-            for n in range(3):
-                if current_list == subject_code_megalist[n]:
-                    count += 1
-            check_list[m] = count
-
-        subject_codes = subject_code_megalist[check_list.index(max(check_list))]
-
+        subject_codes = results[1]
         # Set Heading
-        worksheet.merge_range(0, 0, 0, 10, college.name+' '+branch.name+' '+' '+str(semester)+' '+'semester')
+        worksheet.merge_range(0, 0, 0, 10, college.name + ' ' + branch.name + ' ' + ' ' + str(semester) + ' ' + 'semester')
 
-        for j in range(len(subject_codes)):
-            worksheet.merge_range(1, j * 3 + 3, 1, (j + 1) * 3 + 2, subject_codes[j])
+        #sub_codes is a list of subject codes with the subject code of open elective subjects
+        # replaced with the string "Open Elective" so that
+        # we can replace the code with the string in the excel heading
+        sub_codes = []
+
+        for code in subject_codes:
+            if code[1:4] == 'OE0':
+                sub_codes.append('Open Elective')
+            else:
+                sub_codes.append(code)
+
+        for j in range(len(sub_codes)):
+            worksheet.merge_range(1, j * 3 + 3, 1, (j + 1) * 3 + 2, sub_codes[j])
+
+
+
 
         worksheet.write(1, 0, 'Roll No')
         worksheet.write(1, 1, 'Name')
@@ -106,7 +96,7 @@ class ExcelGenerator():
             else:
                 worksheet.write(2, c, 'Total')
 
-        for result in results:
+        for result in results[0]:
 
             keys = result['marks'].keys()
             if keys == subject_codes:
@@ -123,6 +113,7 @@ class ExcelGenerator():
                 i -= 1
             i += 1
 
+
     def result_dict(self, college, branch, semester):
         """
         makes a dictionary of result data of each student
@@ -135,18 +126,55 @@ class ExcelGenerator():
         # list of dictionaries
         ls = []
         required_students = Student.objects.filter(college=college.code, branch=branch.code).all()
-
+        #sub_max_marks = []
         for student in required_students:
             student_dict = {}
             for mrks in student.marks_set.all():
                 if mrks.semester == semester:
                     if not student_dict:
-                        student_dict['marks'] = {}
-                    student_dict['marks'][mrks.subject.code] = [mrks.subject.name, mrks.theory, mrks.practical,
-                                                                mrks.internal_theory, mrks.internal_practical]
+                        student_dict["marks"] = {}
+                    '''
+                    if mrks.subject.code not in [sub_tup[0] for sub_tup in sub_max_marks]:
+                        sub_max_marks.append((mrks.subject.code, self.max_marks(max([m.theory + m.practical +
+                        m.internal_theory + m.internal_practical for m in mrks.subject.marks_set.all()]))))
+
+                    '''
+                    student_dict["marks"][mrks.subject.code] = [mrks.subject.name, mrks.theory, mrks.practical,
+                                                                mrks.internal_theory, mrks.internal_practical,
+                                                            ]
             if student_dict:
-                student_dict['name'] = student.name
-                student_dict['fathers_name'] = student.fathers_name
-                student_dict['roll_no'] = student.roll_no
-                ls.append(student_dict)
-        return ls
+                student_dict["name"] = student.name
+                student_dict["fathers_name"] = student.fathers_name
+                student_dict["roll_no"] = student.roll_no
+                ls.append(student_dict) # ls is list containing data dictionaries of students
+
+
+        # TEST : making the list of possible correct subjects
+        # bring in the subjects of first 5 students and compare them,
+        # the list which has max identical lists is the correct list of subjects
+        if len(ls) >= 5:
+            subject_code_megalist = [ls[y]["marks"].keys() for y in range(5)]
+        else:
+            subject_code_megalist = [ls[y]["marks"].keys() for y in range(len(ls))]
+        length_megalist = len(subject_code_megalist)
+        '''
+        for k in range(length_megalist):
+            for j in range(len(subject_code_megalist[k])):
+                if subject_code_megalist[k][j][1:4] == "OE0":
+                    subject_code_megalist[k][j] = "Open Elective"
+        '''
+        check_list = [0 for k in range(length_megalist)]
+
+        for m in range(length_megalist):
+            count = 0
+            current_list = subject_code_megalist[m]
+
+            for n in range(length_megalist):
+                if current_list == subject_code_megalist[n]:
+                    count += 1
+            check_list[m] = count
+
+        subject_codes = subject_code_megalist[check_list.index(max(check_list))]
+
+        return [ls, subject_codes]
+

@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 
 from .excel import ExcelGenerator
+from .analysis_graph import GraphGenerator
 from .forms import AnalysisForm, LoginForm, PasswordResetForm
 from .models import Student, Subject
 from result_analyzer.settings import BASE_DIR
@@ -53,8 +54,10 @@ class AnalysisFormView(views.LoginRequiredMixin, generic.FormView):
 
         else:
             # Redirect to analysis
+            obj = GraphGenerator(college_code, branch_code, int(sem))
+            data = obj.graph_selector()
 
-            data = self.create_analysis_data(form)
+            #data = self.create_analysis_data(form)
 
             return render(self.request, 'analysis.html', dictionary={'data': data})
 
