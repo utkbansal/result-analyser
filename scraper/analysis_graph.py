@@ -10,6 +10,7 @@ class GraphGenerator(ExcelGenerator):
     by the user for analysis and this class implements some methods to
     plot graphs of that data using Google Application Programming Interface
     """
+
     def __init__(self, college_codes, branch_codes, semester):
         """
 
@@ -25,7 +26,6 @@ class GraphGenerator(ExcelGenerator):
 
     def graph_selector(self):
         if len(self.colleges) == 1 and len(self.branches) == 1 and len(self.semester) == 1:
-            students = Student.objects.filter(college = self.colleges[0], branch = self.branches).all()
             results = self.result_dict(self.colleges[0], self.branches[0], self.semester[0])
             data = [['Subject Codes', 'Maximum Obtained', 'Average Marks', 'Minimum Obtained'], ]
             data_list = [[str(sub_code), 0, 0, 300] for sub_code in results[1]]
@@ -33,8 +33,6 @@ class GraphGenerator(ExcelGenerator):
             max_marks = []
             for i in range(len(results[0])):
                 sub_code_keys = results[0][i]["marks"].keys()
-                #print 'Subject code keys: ', sub_code_keys
-                #print 'Results subjects: ', [results[1][j] for j in range(len(sub_code_keys))]
                 if sub_code_keys == [results[1][j] for j in range(len(sub_code_keys))]:
                     num_students += 1
                     if not max_marks:
@@ -54,15 +52,13 @@ class GraphGenerator(ExcelGenerator):
                 data_list[k][1] = int(data_list[k][1] / float(max_marks[k]) * 100)
                 data_list[k][2] = int(data_list[k][2] / float(max_marks[k]) * 100)
                 data_list[k][3] = int(data_list[k][3] / float(max_marks[k]) * 100)
-            #print data + data_list[:2]
+            # print data + data_list[:2]
             return data + data_list
 
-
     def max_of_subject(self, code):
-        subject = Subject.objects.filter(code = code).first()
+        subject = Subject.objects.filter(code=code).first()
         return max([marks.theory + marks.practical + marks.internal_practical + marks.internal_theory
-        for marks in subject.marks_set.all()])
-
+                    for marks in subject.marks_set.all()])
 
     def max_marks(self, n):
         n = int(n)
