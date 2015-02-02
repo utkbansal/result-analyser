@@ -65,9 +65,10 @@ class ExcelGenerator():
         i = 2
         subject_codes = results[1]
         # Set Heading
-        worksheet.merge_range(0, 0, 0, 10, college.name + ' ' + branch.name + ' ' + ' ' + str(semester) + ' ' + 'semester')
+        worksheet.merge_range(0, 0, 0, 10,
+                              college.name + ' ' + branch.name + ' ' + ' ' + str(semester) + ' ' + 'semester')
 
-        #sub_codes is a list of subject codes with the subject code of open elective subjects
+        # sub_codes is a list of subject codes with the subject code of open elective subjects
         # replaced with the string "Open Elective" so that
         # we can replace the code with the string in the excel heading
         sub_codes = []
@@ -80,9 +81,6 @@ class ExcelGenerator():
 
         for j in range(len(sub_codes)):
             worksheet.merge_range(1, j * 3 + 3, 1, (j + 1) * 3 + 2, sub_codes[j])
-
-
-
 
         worksheet.write(1, 0, 'Roll No')
         worksheet.write(1, 1, 'Name')
@@ -101,18 +99,17 @@ class ExcelGenerator():
             keys = result['marks'].keys()
             if keys == subject_codes:
                 for k in range(0, 3 * len(keys), 3):
-                    worksheet.write(i+1, k + 3, result['marks'][keys[k / 3]][1] + result['marks'][keys[k / 3]][2])
-                    worksheet.write(i+1, k + 4, result['marks'][keys[k / 3]][3] + result['marks'][keys[k / 3]][4])
-                    worksheet.write(i+1, k + 5, result['marks'][keys[k / 3]][1] + result['marks'][keys[k / 3]][2]
+                    worksheet.write(i + 1, k + 3, result['marks'][keys[k / 3]][1] + result['marks'][keys[k / 3]][2])
+                    worksheet.write(i + 1, k + 4, result['marks'][keys[k / 3]][3] + result['marks'][keys[k / 3]][4])
+                    worksheet.write(i + 1, k + 5, result['marks'][keys[k / 3]][1] + result['marks'][keys[k / 3]][2]
                                     + result['marks'][keys[k / 3]][3] + result['marks'][keys[k / 3]][4])
 
-                worksheet.write(i+1, 0, result['roll_no'])
-                worksheet.write(i+1, 1, result['name'])
-                worksheet.write(i+1, 2, result['fathers_name'])
+                worksheet.write(i + 1, 0, result['roll_no'])
+                worksheet.write(i + 1, 1, result['name'])
+                worksheet.write(i + 1, 2, result['fathers_name'])
             else:
                 i -= 1
             i += 1
-
 
     def result_dict(self, college, branch, semester):
         """
@@ -126,7 +123,7 @@ class ExcelGenerator():
         # list of dictionaries
         ls = []
         required_students = Student.objects.filter(college=college.code, branch=branch.code).all()
-        #sub_max_marks = []
+        # sub_max_marks = []
         for student in required_students:
             student_dict = {}
             for mrks in student.marks_set.all():
@@ -141,13 +138,12 @@ class ExcelGenerator():
                     '''
                     student_dict["marks"][mrks.subject.code] = [mrks.subject.name, mrks.theory, mrks.practical,
                                                                 mrks.internal_theory, mrks.internal_practical,
-                                                            ]
+                                                                ]
             if student_dict:
                 student_dict["name"] = student.name
                 student_dict["fathers_name"] = student.fathers_name
                 student_dict["roll_no"] = student.roll_no
-                ls.append(student_dict) # ls is list containing data dictionaries of students
-
+                ls.append(student_dict)  # ls is list containing data dictionaries of students
 
         # TEST : making the list of possible correct subjects
         # bring in the subjects of first 5 students and compare them,
@@ -177,4 +173,3 @@ class ExcelGenerator():
         subject_codes = subject_code_megalist[check_list.index(max(check_list))]
 
         return [ls, subject_codes]
-
