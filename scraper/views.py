@@ -56,21 +56,8 @@ class AnalysisFormView(views.LoginRequiredMixin, generic.FormView):
             # Redirect to analysis
             obj = GraphGenerator(college_code, branch_code, int(sem))
             data = obj.graph_selector()
-
-            #data = self.create_analysis_data(form)
-
             return render(self.request, 'analysis.html', dictionary={'data': data})
 
-    def create_analysis_data(self, form):
-        """
-        creates a list with data required to generate
-        google chart of the information selected by user
-        :param form: the form submitted by the user
-        :return: data needed to create excel
-        """
-        college_codes = form.cleaned_data['college_code']  # codes of the colleges selected by the user
-        branch_codes = form.cleaned_data['branch_code']  # codes of the branches selected by the user
-        sem = form.cleaned_data['semester']  # semester selected by the user
 
 class LoginView(views.AnonymousRequiredMixin, generic.FormView):
     form_class = LoginForm

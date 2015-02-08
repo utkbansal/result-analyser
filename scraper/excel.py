@@ -1,5 +1,11 @@
 from .models import Student, College, Branch
 import xlsxwriter
+from multiprocessing import Pool
+from django.core.exceptions import MultipleObjectsReturned
+
+
+def work(student_tup):
+    return ExcelGenerator.dict_generator(student_tup)
 
 
 class ExcelGenerator():
@@ -35,13 +41,14 @@ class ExcelGenerator():
         workbook = xlsxwriter.Workbook('test.xlsx')
         # now write data of each combination in
         # a separate worksheet of the above workbook
-        [ExcelGenerator.writer(self, workbook, college, branch, semester)
+        [ExcelGenerator.writer(workbook, college, branch, semester)
          for college in self.colleges for branch in self.branches
          for semester in self.semester]
 
         workbook.close()
 
-    def writer(self, workbook, college, branch, semester):
+    @staticmethod
+    def writer(workbook, college, branch, semester):
         """
         creates and saves an excel file containing
         marks of each student of given college, branch
@@ -49,9 +56,11 @@ class ExcelGenerator():
         college and returns False otherwise
 
         """
-        results = ExcelGenerator.result_dict(self, college, branch, semester)
+        results = ExcelGenerator.result_dict(college, branch, semester)
         # If result cannot be generated for the give combination
-        if not results[0]:
+        if not results:
+            return False
+        elif not results[0]:
             return False
 
         # Add a new worksheet to the workbook with appropriate name
@@ -66,7 +75,7 @@ class ExcelGenerator():
         subject_codes = results[1]
         # Set Heading
         worksheet.merge_range(0, 0, 0, 10,
-                              college.name + ' ' + branch.name + ' ' + ' ' + str(semester) + ' ' + 'semester')
+                              college.name + ' - ' + branch.name + ' - ' + ' ' + str(semester) + ' ' + 'semester')
 
         # sub_codes is a list of subject codes with the subject code of open elective subjects
         # replaced with the string "Open Elective" so that
@@ -75,7 +84,7 @@ class ExcelGenerator():
 
         for code in subject_codes:
             if code[1:4] == 'OE0':
-                sub_codes.append('Open Elective')
+                sub_codes.append('OE0')
             else:
                 sub_codes.append(code)
 
@@ -111,7 +120,8 @@ class ExcelGenerator():
                 i -= 1
             i += 1
 
-    def result_dict(self, college, branch, semester):
+    @staticmethod
+    def result_dict(college, branch, semester):
         """
         makes a dictionary of result data of each student
         of given college_code and branch_code
@@ -119,32 +129,21 @@ class ExcelGenerator():
         returns: a list of dictionaries containing
         data of each student
         """
-
-        # list of dictionaries
+        required_students = [(student, semester) for student in Student.objects.filter(
+            college=college.code, branch=branch.code).all()]
         ls = []
-        required_students = Student.objects.filter(college=college.code, branch=branch.code).all()
-        # sub_max_marks = []
-        for student in required_students:
-            student_dict = {}
-            for mrks in student.marks_set.all():
-                if mrks.semester == semester:
-                    if not student_dict:
-                        student_dict["marks"] = {}
-                    '''
-                    if mrks.subject.code not in [sub_tup[0] for sub_tup in sub_max_marks]:
-                        sub_max_marks.append((mrks.subject.code, self.max_marks(max([m.theory + m.practical +
-                        m.internal_theory + m.internal_practical for m in mrks.subject.marks_set.all()]))))
-
-                    '''
-                    student_dict["marks"][mrks.subject.code] = [mrks.subject.name, mrks.theory, mrks.practical,
-                                                                mrks.internal_theory, mrks.internal_practical,
-                                                                ]
-            if student_dict:
-                student_dict["name"] = student.name
-                student_dict["fathers_name"] = student.fathers_name
-                student_dict["roll_no"] = student.roll_no
-                ls.append(student_dict)  # ls is list containing data dictionaries of students
-
+        '''
+        pool = Pool(1)
+        ls = pool.map(work, required_students)
+        ls[:] = [item for item in ls if item != {}]
+        '''
+        for student_tup in required_students:
+            std_dict = work(student_tup)
+            if std_dict:
+                ls.append(std_dict)
+        print 'Number of students in semester: ', len(ls)
+        if len(ls) == 0:
+            return False
         # TEST : making the list of possible correct subjects
         # bring in the subjects of first 5 students and compare them,
         # the list which has max identical lists is the correct list of subjects
@@ -153,12 +152,6 @@ class ExcelGenerator():
         else:
             subject_code_megalist = [ls[y]["marks"].keys() for y in range(len(ls))]
         length_megalist = len(subject_code_megalist)
-        '''
-        for k in range(length_megalist):
-            for j in range(len(subject_code_megalist[k])):
-                if subject_code_megalist[k][j][1:4] == "OE0":
-                    subject_code_megalist[k][j] = "Open Elective"
-        '''
         check_list = [0 for k in range(length_megalist)]
 
         for m in range(length_megalist):
@@ -173,3 +166,36 @@ class ExcelGenerator():
         subject_codes = subject_code_megalist[check_list.index(max(check_list))]
 
         return [ls, subject_codes]
+
+    @staticmethod
+    def dict_generator(student_tup):
+        student = student_tup[0]
+        semester = student_tup[1]
+        student_dict = {}
+
+        for mrks in student.marks_set.all():
+            if mrks.semester == semester:
+                if not student_dict:
+                    student_dict["marks"] = {}
+                if mrks.subject.code[1: 4] == 'OE0':
+                    #print type(mrks.subject.name)
+                    #print mrks.subject.name
+                    student_dict["marks"]['OE0'] = [mrks.subject.name, mrks.theory, mrks.practical,
+                                                    mrks.internal_theory, mrks.internal_practical, mrks.subject.code
+                                                    ]
+                else:
+                    #print type(mrks.subject.name)
+                    #print mrks.subject.name
+                    student_dict["marks"][mrks.subject.code] = [mrks.subject.name, mrks.theory, mrks.practical,
+                                                                mrks.internal_theory, mrks.internal_practical,
+                                                                mrks.subject.code
+                                                                ]
+
+        if student_dict:
+            student_dict["name"] = student.name
+            student_dict["fathers_name"] = student.fathers_name
+            student_dict["roll_no"] = student.roll_no
+            return student_dict  # student_dict is the dictionary containing info about a student
+
+        else:
+            return None
