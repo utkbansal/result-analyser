@@ -55,3 +55,15 @@ class Marks(models.Model):
 
     def __unicode__(self):
         return unicode(self.theory)
+
+
+class AverageMarks(models.Model):
+    college = models.ForeignKey('College')
+    branch = models.ForeignKey('Branch')
+    semester = models.IntegerField()
+    average = models.IntegerField()
+    maximum = models.IntegerField()
+    minimum = models.IntegerField()
+
+    def __unicode__(self):
+        return unicode(self.average)

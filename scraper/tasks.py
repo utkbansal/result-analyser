@@ -48,7 +48,6 @@ def roll_no_generator(college_code, year):
     '30', '34', '82', '45', '16', '13', '22', '23', '86', '62','41', '14',
     '70', '72', '43', '40', '42', '07', '84', '85', '87', '46','44', '83',
     '60', '63', '61']
-    branch_codes = ['00', '10', '21', '31', '32', '13', '40']
     if datetime.now().month >= 7:
         year_code = str(current_year - year)
     else:

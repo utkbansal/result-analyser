@@ -1,4 +1,5 @@
 from .models import Student, College, Branch
+from django.db import connection
 import xlsxwriter
 from multiprocessing import Pool
 from django.core.exceptions import MultipleObjectsReturned
@@ -132,15 +133,11 @@ class ExcelGenerator():
         required_students = [(student, semester) for student in Student.objects.filter(
             college=college.code, branch=branch.code).all()]
         ls = []
-        '''
-        pool = Pool(1)
-        ls = pool.map(work, required_students)
-        ls[:] = [item for item in ls if item != {}]
-        '''
         for student_tup in required_students:
             std_dict = work(student_tup)
             if std_dict:
                 ls.append(std_dict)
+
         print 'Number of students in semester: ', len(ls)
         if len(ls) == 0:
             return False
@@ -183,6 +180,7 @@ class ExcelGenerator():
                     student_dict["marks"]['OE0'] = [mrks.subject.name, mrks.theory, mrks.practical,
                                                     mrks.internal_theory, mrks.internal_practical, mrks.subject.code
                                                     ]
+                    #connection.close()
                 else:
                     #print type(mrks.subject.name)
                     #print mrks.subject.name
@@ -190,7 +188,8 @@ class ExcelGenerator():
                                                                 mrks.internal_theory, mrks.internal_practical,
                                                                 mrks.subject.code
                                                                 ]
-
+                    #connection.close()
+        # adding personal details to the dictionary
         if student_dict:
             student_dict["name"] = student.name
             student_dict["fathers_name"] = student.fathers_name

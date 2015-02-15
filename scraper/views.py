@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate, login, logout
 from .excel import ExcelGenerator
 from .analysis_graph import GraphGenerator
 from .forms import AnalysisForm, LoginForm, PasswordResetForm
-from .models import Student, Subject
 from result_analyzer.settings import BASE_DIR
 
 from braces import views
@@ -41,7 +40,6 @@ class AnalysisFormView(views.LoginRequiredMixin, generic.FormView):
         if 'download' in data:  # Checks if user has clicked on download or not
 
             # Downloading logic here
-            # TODO: create a wrapper for create_excel
             obj = ExcelGenerator(college_code, branch_code, int(sem))
             obj.excel_creator()
             excel = open(os.path.join(BASE_DIR, 'test.xlsx'), 'rb')

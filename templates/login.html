@@ -4,8 +4,13 @@
 
 {% block content %}
     <div class="jumbotron">
-        <h1>Welcome to the Result Analyzer...</h1>
+      <h1>Welcome to the Result Analyzer...</h1>
     </div>
-    {% lorem 5 p %}
+    <p>
+      Here is the analyzer of result of the biggest university of the world with over 2 lack students enrolled in
+      various undergraduate programmes. This tool(currently in beta form) analyzes the result of top 20 colleges of
+      <abbr title="Uttar Pradesh Technical University">UPTU</abbr> Noida region and lets you download the detailed
+      excel file of selected college, branch and semester. You can select multiple colleges, branches and semesters.
+    </p>
     {% crispy form %}
 {% endblock %}
