@@ -18,8 +18,8 @@ def marks_total(marks):
     return marks.theory + marks.practical + marks.internal_theory + marks.internal_practical
 
 
-class AnalysisView(generic.TemplateView):
-    template_name = 'analysis.html'
+# class AnalysisView(generic.TemplateView):
+#     template_name = 'analysis.html'
 
 
 class AnalysisFormView(views.LoginRequiredMixin, generic.FormView):
@@ -41,11 +41,11 @@ class AnalysisFormView(views.LoginRequiredMixin, generic.FormView):
 
             # Downloading logic here
             obj = ExcelGenerator(college_code, branch_code, int(sem))
-            obj.excel_creator()
-            excel = open(os.path.join(BASE_DIR, 'test.xlsx'), 'rb')
-            data = excel.read()
-
-            response = HttpResponse(data,
+            output = obj.excel_creator()
+            #excel = open(os.path.join(BASE_DIR, 'test.xlsx'), 'rb')
+            #data = excel.read()
+            output.seek(0)
+            response = HttpResponse(output.read(),
                                     content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename="test.xlsx"'
             return response

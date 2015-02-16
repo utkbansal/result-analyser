@@ -1,6 +1,7 @@
 from .models import Student, College, Branch
 from django.db import connection
 import xlsxwriter
+import StringIO
 from multiprocessing import Pool
 from django.core.exceptions import MultipleObjectsReturned
 
@@ -39,7 +40,8 @@ class ExcelGenerator():
             self.semester = [semester]
 
     def excel_creator(self):
-        workbook = xlsxwriter.Workbook('test.xlsx')
+        output = StringIO.StringIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         # now write data of each combination in
         # a separate worksheet of the above workbook
         [ExcelGenerator.writer(workbook, college, branch, semester)
@@ -47,6 +49,7 @@ class ExcelGenerator():
          for semester in self.semester]
 
         workbook.close()
+        return output
 
     @staticmethod
     def writer(workbook, college, branch, semester):
