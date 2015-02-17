@@ -5,13 +5,34 @@ from bs4 import BeautifulSoup
 
 from scraper.models import Student, College, Branch, Subject, Marks
 import requests
+from requests.exceptions import ConnectionError
+import time
+import sys
+
+
+def get(url, i=0):
+    # this function tries to get a url and fails gracefully in case of a connection error
+    # it will try 5 times to get the response after which it will exit the script
+    if i in range(5):
+        try:
+            response = requests.get(url)
+            return response
+
+        except ConnectionError:
+            print "sleeping..."
+            time.sleep(2)
+            i += 1
+            get(url, i)
+    else:
+        print 'Connection Error'
+        sys.exit(0)
 
 
 def save_colleges():
     # TODO: remove this function and create a bash script to populate the db from the sql script
     # URL of wikipedia page where list of the institutions of UPTU and their code is given
     url = 'http://en.wikipedia.org/wiki/List_of_colleges_affiliated_to_Uttar_Pradesh_Technical_University'
-    response = requests.get(url)
+    response = get(url)
     college_soup = BeautifulSoup(response.text)
     # Slicing the head row
     rows = college_soup.table.find_all('tr')[1:]
@@ -67,7 +88,26 @@ def get_result_data(roll_no, year):
         }
 
         url = urls[year]
-        response = s.get(url)
+
+        def get_in_session(url, i=0):
+            # this function tries to get a url and fails gracefully in case of a connection error
+            # it will try 5 times to get the response after which it will exit the script
+            if i in range(5):
+                try:
+                    response = s.get(url)
+                    return response
+
+                except ConnectionError:
+                    print "sleeping..."
+                    time.sleep(2)
+                    i += 1
+                    get_in_session(url, i)
+            else:
+                print 'Connection Error'
+                sys.exit(0)
+
+        response = get_in_session(url)
+
         captcha = response.cookies['Captcha'].split('=')[1]
         soup = BeautifulSoup(response.text)
         data1 = str(soup.find(id='__VIEWSTATE')['value'])
