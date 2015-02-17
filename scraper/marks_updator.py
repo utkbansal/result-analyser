@@ -61,7 +61,7 @@ class AverageGenerator(object):
                         pos[i] += 1
             real_subject_codes = subject_codes_list[pos.index(max(pos))]  # stores correct subject codes(most probably)
             total = 1000.0
-            student_count = 0 # counts number of students of which we will be taking average
+            student_count = 0  # counts number of students of which we will be taking average
             for student in required_students:
                 subjects_marks = [sub_marks for sub_marks in student.marks_set.all() if
                                   sub_marks.semester == self.semester]

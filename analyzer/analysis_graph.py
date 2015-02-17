@@ -232,8 +232,8 @@ class GraphGenerator(ExcelGenerator):
                     for college in self.colleges:
                         flag = 1
                         for branch in common_branches:
-                            branch_marks = AverageMarks(college=college, branch=branch,
-                                                        semster=sem).first()
+                            branch_marks = AverageMarks.objects.filter(college=college, branch=branch,
+                                                                       semester=sem).first()
                             if not branch_marks:
                                 flag = 0
                         if flag == 1:

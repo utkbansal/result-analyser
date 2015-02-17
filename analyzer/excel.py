@@ -1,9 +1,8 @@
-from .models import Student, College, Branch
-from django.db import connection
+from scraper.models import Student, College, Branch
+
 import xlsxwriter
+
 import StringIO
-from multiprocessing import Pool
-from django.core.exceptions import MultipleObjectsReturned
 
 
 def work(student_tup):
@@ -83,11 +82,9 @@ class ExcelGenerator():
         heading.set_font_size(15)
         heading.set_align('center')
 
-
         table_headers = workbook.add_format()
         table_headers.set_bold()
         table_headers.set_align('center')
-
 
         i = 2
         subject_codes = results[1]
@@ -193,26 +190,24 @@ class ExcelGenerator():
                 if not student_dict:
                     student_dict["marks"] = {}
                 if mrks.subject.code[1: 4] == 'OE0':
-                    #print type(mrks.subject.name)
-                    #print mrks.subject.name
                     student_dict["marks"]['OE0'] = [mrks.subject.name, mrks.theory, mrks.practical,
                                                     mrks.internal_theory, mrks.internal_practical, mrks.subject.code
                                                     ]
-                    #connection.close()
+
                 else:
-                    #print type(mrks.subject.name)
-                    #print mrks.subject.name
                     student_dict["marks"][mrks.subject.code] = [mrks.subject.name, mrks.theory, mrks.practical,
                                                                 mrks.internal_theory, mrks.internal_practical,
                                                                 mrks.subject.code
                                                                 ]
-                    #connection.close()
+
         # adding personal details to the dictionary
         if student_dict:
             student_dict["name"] = student.name
             student_dict["fathers_name"] = student.fathers_name
             student_dict["roll_no"] = student.roll_no
-            return student_dict  # student_dict is the dictionary containing info about a student
+
+            # student_dict is the dictionary containing info about a student
+            return student_dict
 
         else:
             return None

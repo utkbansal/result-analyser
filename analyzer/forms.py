@@ -1,5 +1,5 @@
 from django import forms
-from .models import College, Branch, Student
+from scraper.models import College, Branch, Student
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, ButtonHolder, Submit
 from django.contrib.auth.forms import AuthenticationForm

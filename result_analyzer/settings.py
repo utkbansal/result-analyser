@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'scraper',
     'crispy_forms',
     'django.contrib.webdesign',
+    'analyzer',
 )
 
 MIDDLEWARE_CLASSES = (
