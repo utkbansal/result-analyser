@@ -75,11 +75,26 @@ class ExcelGenerator():
         worksheet.set_column(0, 0, 12)
         worksheet.set_column(1, 2, 25)
 
+        # Adding styles
+
+        # heading is the college name
+        heading = workbook.add_format()
+        heading.set_bold()
+        heading.set_font_size(15)
+        heading.set_align('center')
+
+
+        table_headers = workbook.add_format()
+        table_headers.set_bold()
+        table_headers.set_align('center')
+
+
         i = 2
         subject_codes = results[1]
         # Set Heading
         worksheet.merge_range(0, 0, 0, 10,
-                              college.name + ' - ' + branch.name + ' - ' + ' ' + str(semester) + ' ' + 'semester')
+                              college.name + ' - ' + branch.name + ' - ' + ' ' + str(semester) + ' ' + 'semester',
+                              heading)
 
         # sub_codes is a list of subject codes with the subject code of open elective subjects
         # replaced with the string "Open Elective" so that
@@ -93,19 +108,19 @@ class ExcelGenerator():
                 sub_codes.append(code)
 
         for j in range(len(sub_codes)):
-            worksheet.merge_range(1, j * 3 + 3, 1, (j + 1) * 3 + 2, sub_codes[j])
+            worksheet.merge_range(1, j * 3 + 3, 1, (j + 1) * 3 + 2, sub_codes[j], table_headers)
 
-        worksheet.write(1, 0, 'Roll No')
-        worksheet.write(1, 1, 'Name')
-        worksheet.write(1, 2, 'Fathers Name')
+        worksheet.write(1, 0, 'Roll No', table_headers)
+        worksheet.write(1, 1, 'Name', table_headers)
+        worksheet.write(1, 2, 'Fathers Name', table_headers)
 
         for c in range(3, 3 * len(subject_codes) + 3):
             if c % 3 == 0:
-                worksheet.write(2, c, 'External')
+                worksheet.write(2, c, 'External', table_headers)
             elif c % 3 == 1:
-                worksheet.write(2, c, 'Internal')
+                worksheet.write(2, c, 'Internal', table_headers)
             else:
-                worksheet.write(2, c, 'Total')
+                worksheet.write(2, c, 'Total', table_headers)
 
         for result in results[0]:
 
