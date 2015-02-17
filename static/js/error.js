@@ -11,3 +11,17 @@ function ValidateForm() {
   }
 
 }
+
+
+function ValidateResetForm() {
+  var password1 = document.forms[0]["password1"].value;
+  var password2 = document.forms[0]["password2"].value;
+  if (password1 != password2) {
+    document.getElementById('x').innerHTML = '<div class="alert alert-error alert-danger"> ' +
+    '<a href="#" class="close" data-dismiss="alert">&times;</a> ' +
+    "<strong>Error! </strong> Passwords don't match " +
+    '</div>';
+    return false;
+  }
+
+}

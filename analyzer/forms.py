@@ -75,6 +75,7 @@ class PasswordResetForm(forms.Form):
         super(PasswordResetForm, self).__init__(*args, **kwargs)
 
         self.helper = FormHelper()
+        self.helper.attrs = {'onsubmit': 'return ValidateResetForm()'}
         self.helper.layout = Layout(
             'old_password',
             'password1',

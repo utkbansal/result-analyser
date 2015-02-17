@@ -85,6 +85,4 @@ class PasswordChangeView(views.LoginRequiredMixin, generic.FormView):
                 user.set_password(form.cleaned_data['password1'])
                 user.save()
                 return super(PasswordChangeView, self).form_valid(form)
-
-        else:
-            return self.form_invalid(form)
+        return self.form_invalid(form)
