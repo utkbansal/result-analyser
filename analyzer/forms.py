@@ -36,7 +36,7 @@ class AnalysisForm(forms.Form):
         super(AnalysisForm, self).__init__(*args, **kwargs)
 
         self.helper = FormHelper()
-        self.helper.attrs = {'onsubmit': 'return ValidateForm()', 'name': 'form'}
+        self.helper.attrs = {'name': 'form', 'onsubmit': 'return ValidateForm()', 'onfocus': 'RemoveError()'}
         self.helper.layout = Layout(
             'college_code',
             'branch_code',

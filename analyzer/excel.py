@@ -43,9 +43,12 @@ class ExcelGenerator():
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         # now write data of each combination in
         # a separate worksheet of the above workbook
-        [ExcelGenerator.writer(workbook, college, branch, semester)
-         for college in self.colleges for branch in self.branches
-         for semester in self.semester]
+        excel_list = [ExcelGenerator.writer(workbook, college, branch, semester)
+                      for college in self.colleges for branch in self.branches
+                      for semester in self.semester]
+        print excel_list
+        if not filter(None, excel_list):
+            return "Combination doesn't exist"
 
         workbook.close()
         return output
@@ -90,7 +93,7 @@ class ExcelGenerator():
         subject_codes = results[1]
         # Set Heading
         worksheet.merge_range(0, 0, 0, 10,
-                              college.name + ' - ' + branch.name + ' - ' + ' ' + str(semester) + ' ' + 'semester',
+                              college.name + ' - ' + branch.name + ' - Semester: ' + str(semester),
                               heading)
 
         # sub_codes is a list of subject codes with the subject code of open elective subjects
@@ -135,6 +138,7 @@ class ExcelGenerator():
             else:
                 i -= 1
             i += 1
+        return True
 
     @staticmethod
     def result_dict(college, branch, semester):

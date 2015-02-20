@@ -10,7 +10,16 @@
     <div class="jumbotron">
         <h1>Welcome to the Result Analyzer...</h1>
     </div>
-    <div id="x"></div>
+    <div id="no-data"></div>
+    {% if messages %}
+        <div id="wrong-data" class="alert alert-error alert-danger">
+
+            {% for msg in messages %}
+                {{ msg }}
+            {% endfor %}
+
+        </div>
+    {% endif %}
 
     {% crispy form %}
 
@@ -23,6 +32,9 @@
 
     <script type="text/javascript">
     $('select').select2();
+    // No idea how the following line works, it just calls the RemoveError function
+    // whenever there is any change in the form data
+    $eventSelect.on("change", function (e) { RemoveError(); });
     </script>
 
 {% endblock js %}
