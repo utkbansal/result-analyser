@@ -1,31 +1,39 @@
 {% extends 'base.html' %}
-{% load webdesign %}
 
 {% block content %}
-    <div id="columnchart_material" style="width: 900px; height: 500px;"></div>
-    Analysis of the result on the basis of your choice of college, branch and semester
 
-{% endblock %}
 
-{% block js %}
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-      google.load("visualization", "1.1", {packages:["bar"]});
-      google.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable({{ data|safe }});
+    {% if 'data' in data.keys %}
+        <div id="columnchart_material" style="width: 900px; height: 500px;"></div>
+    {% else %}
+        <div class="text-danger">
+        {{ data.error }}
+        </div>
+    {% endif %}
 
-        var options = {
-          chart: {
-            title: "Result Analyzer",
-            subtitle: 'Performance based on result of Session: 2013-2014'
+{% endblock content%}
+
+{% if 'data' in data.keys %}
+    {% block js %}
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+          google.load("visualization", "1.1", {packages:["bar"]});
+          google.setOnLoadCallback(drawChart);
+          function drawChart() {
+            var data = google.visualization.arrayToDataTable({{ data.data|safe }});
+
+            var options = {
+              chart: {
+                title: '{{data.title|safe}}',
+                subtitle: 'Performance based on result of Session: 2013-2014'
+              }
+            };
+
+            var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+            chart.draw(data, options);
           }
-        };
+        </script>
 
-        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
-
-        chart.draw(data, options);
-      }
-    </script>
-
-{% endblock %}
+    {% endblock js %}
+{% endif %}
