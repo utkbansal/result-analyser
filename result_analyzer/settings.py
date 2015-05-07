@@ -104,3 +104,16 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # Set the default login url
 LOGIN_URL = '/'
+
+
+URLS = {
+    # New url
+    1: 'http://uptu.ac.in/results/gbturesult_11_12/Odd2015Result/frmBte'
+       'ch1uplko2015dghdjhg.aspx',
+    2: 'http://uptu.ac.in/results/gbturesult_11_12/Odd2015Result/frm'
+       'Btech3uplko2015fhfdhfdhy.aspx',
+    3: 'http://uptu.ac.in/results/gbturesult_11_12/Odd2015Result/frm'
+       'Btech5uplko2015lkjdfg.aspx',
+    4: 'http://uptu.ac.in/results/gbturesult_11_12/Odd2015Result/frm'
+       'Btech7uplko2015yykkll.aspx'
+}
