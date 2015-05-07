@@ -13,3 +13,9 @@ venv/
 
 #byte-compiled files
 *.pyc
+
+#exel reports
+*.xlsx
+
+#sql files
+*.sql

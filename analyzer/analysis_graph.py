@@ -146,42 +146,57 @@ class GraphGenerator(ExcelGenerator):
                         sem_list.append(0)  # adding zero if marks doesn't exit for that semester
                 data.append(sem_list)
             if len(data) == 1:
-                return_dict['error'] = "Branches doesn't exist for selected college"
+                return_dict['error'] = "Branches don't exist for select college"
                 return return_dict
             return_dict['data'] = data
             return return_dict
 
         # plots marks of selected colleges for given branch and semester
-        elif len(self.colleges) != 1 and len(self.branches) == 1 and len(self.semester) == 1:
+        elif len(self.colleges) != 1 and len(self.branches) == 1 and\
+                len(self.semester) == 1:
             # dictionary to be returned
             return_dict = {}
             data = [['Colleges', 'Maximum', 'Average', 'Minimum'], ]
-            return_dict['title'] = "College-wise analysis of Branch: " + branch_dict[self.branches[0].code] + \
+            return_dict['title'] = "College-wise analysis of Branch: " +\
+                                   branch_dict[self.branches[0].code] + \
                                    " - Semester: " + str(self.semester[0])
             for college in self.colleges:
-                college_marks = AverageMarks.objects.filter(college=college, branch=self.branches[0],
-                                                            semester=self.semester[0]).first()
+                college_marks = AverageMarks.objects.filter(
+                    college=college,
+                    branch=self.branches[0],
+                    semester=self.semester[0]
+                ).first()
                 if college_marks:
-                    data.append([college_dict[college.code], int(college_marks.maximum), int(college_marks.average),
-                                 int(college_marks.minimum)])
+                    data.append([
+                        college_dict[college.code],
+                        int(college_marks.maximum),
+                        int(college_marks.average),
+                        int(college_marks.minimum)
+                    ])
             if len(data) == 1:
-                return_dict['error'] = "No colleges for selected branch and semester"
+                return_dict['error'] = "No colleges for selected branch"
+                " and semester"
                 return return_dict
             return_dict['data'] = data
             return return_dict
 
         # plots semester-wise marks of different colleges for selected branch
-        elif len(self.colleges) != 1 and len(self.branches) == 1 and len(self.semester) != 1:
+        elif len(self.colleges) != 1 and len(self.branches) == 1 and\
+                len(self.semester) != 1:
             # dictionary to be returned
             return_dict = {}
             data = [['Semesters', ], ]
-            return_dict['title'] = "Semester-wise analysis of Branch: " + branch_dict(self.branches[0].code)
+            return_dict['title'] = "Semester-wise analysis of Branch: " +\
+                                   branch_dict[self.branches[0].code]
             existing_colleges = []
             # next 2 for loops for selecting which colleges have selected branch
             for sem in self.semester:
                 for college in self.colleges:
-                    college_marks = AverageMarks.objects.filter(college=college, branch=self.branches[0],
-                                                                semester=sem).first()
+                    college_marks = AverageMarks.objects.filter(
+                        college=college,
+                        branch=self.branches[0],
+                        semester=sem
+                    ).first()
                     if college_marks:  # add college if marks exist
                         if college not in existing_colleges:
                             existing_colleges.append(college)
@@ -190,32 +205,42 @@ class GraphGenerator(ExcelGenerator):
             for sem in self.semester:
                 sem_list = [str(sem), ]
                 for i in range(len(existing_colleges)):
-                    college_marks = AverageMarks.objects.filter(college=existing_colleges[i], branch=self.branches[0],
-                                                                semester=sem).first()
+                    college_marks = AverageMarks.objects.filter(
+                        college=existing_colleges[i],
+                        branch=self.branches[0],
+                        semester=sem
+                    ).first()
                     if college_marks:
                         sem_list.append(int(college_marks.average))
                     else:
                         sem_list.append(0)
                 data.append(sem_list)
             if len(data) == 1:
-                return_dict['error'] = "Selected branch doesn't exist in selected colleges"
+                return_dict['error'] = "Selected branch doesn't exist in"
+                " selected colleges"
                 return return_dict
             return_dict['data'] = data
             return return_dict
 
-        # plots branch-wise marks of different colleges(clustered) for selected semester
-        elif len(self.colleges) != 1 and len(self.branches) != 1 and len(self.semester) == 1:
+        # plots branch-wise marks of different colleges(clustered)
+        # for selected semester
+        elif len(self.colleges) != 1 and len(self.branches) != 1 and\
+                len(self.semester) == 1:
             # dictionary to be returned
             return_dict = {}
             data = [['Branches', ], ]
-            return_dict['title'] = "Branch-wise analysis of Semester: " + str(self.semester[0])
+            return_dict['title'] = "Branch-wise analysis of Semester: " + \
+                                   str(self.semester[0])
             common_branches = []
             # selecting common branches
             for branch in self.branches:
                 flag = 1
                 for college in self.colleges:
-                    college_marks = AverageMarks.objects.filter(college=college, branch=branch,
-                                                                semester=self.semester[0]).first()
+                    college_marks = AverageMarks.objects.filter(
+                        college=college,
+                        branch=branch,
+                        semester=self.semester[0]
+                    ).first()
                     if not college_marks:
                         flag = 0
                 if flag == 1:
@@ -225,8 +250,11 @@ class GraphGenerator(ExcelGenerator):
                 for branch in common_branches:
                     branch_list = [branch_dict[branch.code], ]
                     for college in self.colleges:
-                        college_marks = AverageMarks.objects.filter(college=college, branch=branch,
-                                                                    semester=self.semester[0]).first()
+                        college_marks = AverageMarks.objects.filter(
+                            college=college,
+                            branch=branch,
+                            semester=self.semester[0]
+                        ).first()
                         if college_marks:
                             if college_dict[college.code] not in data[0]:
                                 data[0].append(college_dict[college.code])
@@ -239,8 +267,11 @@ class GraphGenerator(ExcelGenerator):
             for college in self.colleges:
                 flag = 1
                 for branch in self.branches:
-                    branch_marks = AverageMarks.objects.filter(college=college, branch=branch,
-                                                               semester=self.semester[0])
+                    branch_marks = AverageMarks.objects.filter(
+                        college=college,
+                        branch=branch,
+                        semester=self.semester[0]
+                    )
                     if not branch_marks:
                         flag = 0
                 if flag == 1:
@@ -250,8 +281,11 @@ class GraphGenerator(ExcelGenerator):
                 for branch in self.branches:
                     branch_list = [branch_dict[branch.code], ]
                     for college in common_colleges:
-                        college_marks = AverageMarks.objects.filter(college=college, branch=branch,
-                                                                    semester=self.semester[0]).first()
+                        college_marks = AverageMarks.objects.filter(
+                            college=college,
+                            branch=branch,
+                            semester=self.semester[0]
+                        ).first()
                         if college_marks:
                             if college_dict[college.code] not in data[0]:
                                 data[0].append(college_dict[college.code])
@@ -259,24 +293,32 @@ class GraphGenerator(ExcelGenerator):
                     data.append(branch_list)
                 return_dict['data'] = data
                 return return_dict
-            # if no common branch or common college found then returning the error message
-            return_dict['error'] = "Selected branches do not exist in selected colleges"
+            # if no common branch or common college found then
+            # returning the error message
+            return_dict['error'] = "Selected branches do not exist in "
+            "selected colleges"
             return return_dict
 
-        # plots semester-wise average marks(of all branches) of selected colleges(clustered)
-        elif len(self.colleges) != 0 and len(self.branches) != 1 and len(self.semester) != 1:
+        # plots semester-wise average marks(of all branches) of
+        # selected colleges(clustered)
+        elif len(self.colleges) != 0 and len(self.branches) != 1 and\
+                len(self.semester) != 1:
             # dictionary to be returned
             return_dict = {}
             data = [['Semesters', ]]
-            return_dict['title'] = "Semester-wise analysis of different colleges by taking average of all branches"
+            return_dict['title'] = "Semester-wise analysis of different"
+            " colleges by taking average of all branches"
             for sem in self.semester:
                 sem_list = [str(sem), ]
                 common_branches = []
                 for branch in self.branches:
                     flag = 1
                     for college in self.colleges:
-                        college_marks = AverageMarks.objects.filter(college=college, branch=branch,
-                                                                    semester=sem).first()
+                        college_marks = AverageMarks.objects.filter(
+                            college=college,
+                            branch=branch,
+                            semester=sem
+                        ).first()
                         if not college_marks:
                             flag = 0
                     if flag == 1:
@@ -289,8 +331,11 @@ class GraphGenerator(ExcelGenerator):
                     for college in self.colleges:
                         flag = 1
                         for branch in common_branches:
-                            branch_marks = AverageMarks.objects.filter(college=college, branch=branch,
-                                                                       semester=sem).first()
+                            branch_marks = AverageMarks.objects.filter(
+                                college=college,
+                                branch=branch,
+                                semester=sem
+                            ).first()
                             if not branch_marks:
                                 flag = 0
                         if flag == 1:
@@ -300,24 +345,29 @@ class GraphGenerator(ExcelGenerator):
                         data[0].append(college_dict[college.code])
                     college_marks = 0
                     for branch in common_branches:
-                        branch_marks = AverageMarks.objects.filter(college=college, branch=branch,
-                                                                   semester=sem).first()
+                        branch_marks = AverageMarks.objects.filter(
+                            college=college,
+                            branch=branch,
+                            semester=sem
+                        ).first()
                         college_marks += branch_marks.average
-                    college_marks = int(college_marks / float(len(common_branches)))
+                    college_marks = int(college_marks /
+                                        float(len(common_branches)))
                     sem_list.append(college_marks)
                 data.append(sem_list)
             if len(data[0]) != 1:  # returning data
                 return_dict['data'] = data
                 return return_dict
             else:  # returning error message if no data found
-                return_dict['error'] = "Selected branches do not exist for selected colleges"
+                return_dict['error'] = "Selected branches do not exist for"
+                " selected colleges"
                 return return_dict
 
     @staticmethod
     def max_of_subject(code):
         subject = Subject.objects.filter(code=code).first()
-        n = max([marks.theory + marks.practical + marks.internal_practical + marks.internal_theory
-                for marks in subject.marks_set.all()])
+        n = max([marks.theory + marks.practical + marks.internal_practical +
+                 marks.internal_theory for marks in subject.marks_set.all()])
         if n in range(51):
             return 50
         elif n in range(76):
