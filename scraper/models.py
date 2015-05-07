@@ -7,6 +7,8 @@ class Student(models.Model):
     fathers_name = models.CharField(max_length=255)
     college = models.ForeignKey('College')
     branch = models.ForeignKey('Branch')
+    section = models.CharField(blank=True, null=True, max_length=1)
+    status = models.CharField(max_length=10)
 
     def __unicode__(self):
         return unicode(self.roll_no)
@@ -26,14 +28,20 @@ class College(models.Model):
 class Branch(models.Model):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=10, primary_key=True)
+    codename = models.CharField(max_length=5, blank=True)
 
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = 'Branches'
+
 
 class Subject(models.Model):
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=10)
+    code = models.CharField(max_length=10, unique=True)
+    max_internal = models.IntegerField(blank=True, null=True)
+    max_external = models.IntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return self.name
